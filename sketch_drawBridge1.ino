@@ -2,8 +2,8 @@
 int wu = 8;     // waterUp Sensor
 int he = 9;     // highEnough sensor
 int wd = 10;    // waterDown Sensor
-int le = 12;    // lowEnough Sensor.
-int dir = 5;    // direction Relay HIGH -> up;  LOW -> down.
+int le = 11;    // lowEnough Sensor.
+int dir = 5;    // direction DPDT
 int motor = 6;  // motor power relay
 
 double longestPeriod=20000.0;
@@ -18,7 +18,7 @@ volatile boolean shouldLower;
 volatile boolean atLow;
 
 //actuator values
-volatile boolean direkshun;
+volatile boolean direkshun;  //Relay HIGH -> up;  LOW -> down.
 volatile boolean motorsOn;
 
 //Bridge States
@@ -37,6 +37,7 @@ void readSensors(){
   atLow       =   !digitalRead(le);
   direkshun   =   !digitalRead(dir);
   motorsOn    =   !digitalRead(motor);
+  Serial.print( "Word: " + String((shouldRise << 3)+ (atHigh << 2) + (shouldLower << 1) + atLow) + " ");
 }
 
 void takeAction(){
@@ -81,6 +82,8 @@ void highEnough(){
  // Serial.print("highEnough function called.\n");
     Serial.print("Setting motor power: off. Stopped raising the bridge\n");
     digitalWrite(motor,LOW); 
+    digitalWrite(dir,LOW); 
+  
     loopPeriod=longestPeriod;
     bridgeUp = true;
     bridgeDown=false;
@@ -102,6 +105,7 @@ void watersDown(){
 void lowEnough(){  
   //   Serial.print("lowEnough function called.");
        Serial.print("Setting motor power: OFF. Stopped lowering bridge.\n");
+       digitalWrite(dir,HIGH); //direction: down.
        digitalWrite(motor,LOW);
        loopPeriod = longestPeriod;
        isLowering = false; 
